@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import ViewTransitions from "@/components/motion/ViewTransitions";
 import "../styles/globals.css";
 import "../styles/shaders.css";
+import "../styles/animation.css";
+import "../styles/components/card.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

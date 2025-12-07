@@ -12,24 +12,27 @@ export default function TextGradient({
   to?: string;
 }) {
   return (
-    <motion.span
-      style={{
-        backgroundImage: `linear-gradient(45deg, ${from}, ${to})`,
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundSize: "200% 200%",
-        display: "inline-block",
-      }}
-      animate={{
-        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-      }}
-      transition={{
-        duration: 5,
-        ease: "easeInOut",
-        repeat: Infinity,
-      }}
+    <span
+      style={
+        {
+          backgroundImage: `linear-gradient(var(--gradient-angle, 45deg), ${from}, ${to})`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundSize: "200% auto",
+          display: "inline-block",
+          animation: "rotate-gradient 5s linear infinite",
+        } as React.CSSProperties
+      }
+      className="font-bold"
     >
+      <style jsx>{`
+        @keyframes rotate-gradient {
+          to {
+            --gradient-angle: 405deg;
+          }
+        }
+      `}</style>
       {text}
-    </motion.span>
+    </span>
   );
 }

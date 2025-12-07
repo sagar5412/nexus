@@ -1,3 +1,14 @@
-:root {
-  --shader-uniform-1: #000;
+@layer shaders {
+  /* Variables that can be read by JS to pass to shaders */
+  body {
+    --mouse-x: 0;
+    --mouse-y: 0;
+    --shader-time: 0;
+  }
+  
+  /* Class to signal shader active state */
+  .shader-active canvas {
+    /* Potential future CSS Houdini integration */
+    /* background: paint(shader-worklet); */
+  }
 }

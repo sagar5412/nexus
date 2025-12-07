@@ -1,0 +1,47 @@
+@layer utilities {
+  /* Scroll Timeline */
+  @scroll-timeline parallax-timeline {
+    source: auto;
+    orientation: block;
+  }
+
+  .animate-parallax {
+    animation: parallax linear both;
+    animation-timeline: parallax-timeline;
+    animation-range: entry 0% cover 100%;
+  }
+
+  @keyframes parallax {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(var(--parallax-depth, 100px));
+    }
+  }
+
+  /* Custom Property Keyframes */
+  .slide-enter {
+    animation: slide-in 0.5s ease forwards;
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(var(--slide-start, -20px));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
