@@ -11,7 +11,7 @@ import * as LavaLamp from "@/lib/shaders/art-pieces/LavaLamp";
 import * as Starfield from "@/lib/shaders/art-pieces/Starfield";
 import * as VoronoiDream from "@/lib/shaders/art-pieces/VoronoiDream";
 import * as THREE from "three";
-import { useStudioStore } from "@/lib/store/studioStore";
+import { useArtStore } from "@/lib/store/artStore";
 
 const ART_PIECES = {
   FractalFlow,
@@ -28,7 +28,9 @@ function ArtPiece({ name }: { name: ArtPieceName }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Subscribe to store for live updates
-  const storeUniforms = useStudioStore((state) => state.uniforms);
+  const storeUniforms = useArtStore((state) => state.uniforms);
+  const storeColor = useArtStore((state) => state.color);
+  const isPlaying = useArtStore((state) => state.isPlaying);
 
   const MaterialComponent = useMemo(() => {
     return createShaderMaterial(
@@ -44,19 +46,21 @@ function ArtPiece({ name }: { name: ArtPieceName }) {
       const uniforms = materialRef.current.uniforms;
 
       // Standard time animation
-      if (uniforms.time) {
+      if (uniforms.time && isPlaying) {
         // Apply speed multiplier if it exists in store
-        const speed = storeUniforms.speed?.value || 1;
+        const speed = storeUniforms["speed"] || 1;
         uniforms.time.value += delta * speed;
       }
 
-      // Sync other store uniforms to shader uniforms if they match keys
-      // In a real app, we'd map these more strictly
-      Object.keys(storeUniforms).forEach((key) => {
-        if (uniforms[key] && key !== "time") {
-          uniforms[key].value = storeUniforms[key].value;
-        }
-      });
+      // Sync complexity
+      if (uniforms.complexity && storeUniforms["complexity"] !== undefined) {
+        uniforms.complexity.value = storeUniforms["complexity"];
+      }
+
+      // Sync color
+      if (uniforms.color1 && storeColor) {
+        uniforms.color1.value = storeColor;
+      }
     }
   });
 

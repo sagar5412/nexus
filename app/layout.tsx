@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ViewTransitions from "@/components/motion/ViewTransitions";
+import StoreProvider from "@/components/providers/StoreProvider";
 import "../styles/globals.css";
 import "../styles/shaders.css";
 import "../styles/animation.css";
@@ -31,8 +32,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ViewTransitions />
-        {children}
+        <StoreProvider>
+          <ViewTransitions />
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

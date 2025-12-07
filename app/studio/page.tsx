@@ -1,12 +1,12 @@
 "use client";
 
-import { useStudioStore } from "@/lib/store/studioStore";
+import { useArtStore } from "@/lib/store/artStore";
 import ShaderCanvas from "@/components/three/ShaderCanvas";
 import ControlPanel from "@/components/ui/ControlPanel";
 import { useRef } from "react";
 
 export default function StudioPage() {
-  const artName = useStudioStore((state) => state.artName);
+  const artName = useArtStore((state) => state.artName);
   // Ref to access canvas for screenshots
   // Note: ShaderCanvas needs to expose the canvas element or we grab it via DOM
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,12 +28,8 @@ export default function StudioPage() {
       <div className="w-[30%] h-full z-10">
         {/* @ts-ignore */}
         <ControlPanel
-          canvasRef={{
-            current: null,
-            get current() {
-              return getCanvas();
-            },
-          }}
+          // @ts-ignore
+          canvasRef={{ current: getCanvas() }}
         />
       </div>
     </div>
