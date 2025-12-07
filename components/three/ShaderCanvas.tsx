@@ -1,20 +1,9 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  OrbitControls,
-  PerformanceMonitor,
-  Stats,
-  useTexture,
-} from "@react-three/drei";
-import {
-  EffectComposer,
-  Bloom,
-  DepthOfField,
-  Vignette,
-} from "@react-three/postprocessing";
+import { OrbitControls, PerformanceMonitor, Stats } from "@react-three/drei";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Suspense, useMemo, useState, useEffect, useRef } from "react";
-import { useControls } from "leva";
 import { createShaderMaterial } from "@/lib/shaders/createShaderMaterial";
 import * as FractalFlow from "@/lib/shaders/art-pieces/FractalFlow";
 import * as PixelWaves from "@/lib/shaders/art-pieces/PixelWaves";
@@ -22,6 +11,7 @@ import * as LavaLamp from "@/lib/shaders/art-pieces/LavaLamp";
 import * as Starfield from "@/lib/shaders/art-pieces/Starfield";
 import * as VoronoiDream from "@/lib/shaders/art-pieces/VoronoiDream";
 import * as THREE from "three";
+import { useStudioStore } from "@/lib/store/studioStore";
 
 const ART_PIECES = {
   FractalFlow,
@@ -37,6 +27,9 @@ function ArtPiece({ name }: { name: ArtPieceName }) {
   const piece = ART_PIECES[name];
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
+  // Subscribe to store for live updates
+  const storeUniforms = useStudioStore((state) => state.uniforms);
+
   const MaterialComponent = useMemo(() => {
     return createShaderMaterial(
       name,
@@ -48,18 +41,29 @@ function ArtPiece({ name }: { name: ArtPieceName }) {
 
   useFrame((state, delta) => {
     if (materialRef.current) {
-      // Safe access to uniforms
       const uniforms = materialRef.current.uniforms;
+
+      // Standard time animation
       if (uniforms.time) {
-        uniforms.time.value += delta;
+        // Apply speed multiplier if it exists in store
+        const speed = storeUniforms.speed?.value || 1;
+        uniforms.time.value += delta * speed;
       }
+
+      // Sync other store uniforms to shader uniforms if they match keys
+      // In a real app, we'd map these more strictly
+      Object.keys(storeUniforms).forEach((key) => {
+        if (uniforms[key] && key !== "time") {
+          uniforms[key].value = storeUniforms[key].value;
+        }
+      });
     }
   });
 
   return (
     <mesh>
       <planeGeometry args={[2, 2]} />
-      {/* @ts-ignore - dynamic component */}
+      {/* @ts-ignore */}
       <MaterialComponent ref={materialRef} />
     </mesh>
   );
@@ -69,24 +73,20 @@ export default function ShaderCanvas({ artName }: { artName: string }) {
   const [dpr, setDpr] = useState(1.5);
   const [perfMode, setPerfMode] = useState(false);
 
-  // Fallback to FractalFlow if artName is invalid
   const validArtName = (
     ART_PIECES.hasOwnProperty(artName) ? artName : "FractalFlow"
   ) as ArtPieceName;
 
-  useEffect(() => {
-    if (perfMode) {
-      // Logic to reduce quality/complexity could go here
-      console.warn("Performance mode enabled: Reducing quality");
-    }
-  }, [perfMode]);
-
   return (
-    <div className="h-screen w-full bg-black">
+    <div className="h-full w-full bg-black">
       <Canvas
         dpr={dpr}
+        gl={{
+          preserveDrawingBuffer: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+        }}
         onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          // Helpers
         }}
       >
         <Suspense fallback={null}>
