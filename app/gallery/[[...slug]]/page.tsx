@@ -1,8 +1,16 @@
-// Gallery Page
+import ShaderCanvas from "@/components/three/ShaderCanvas";
+
 export default function GalleryPage({
-  params,
+  searchParams,
 }: {
-  params: { slug?: string[] };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchParams: any; // Using any to avoid type complexity with Next.js versions for now
 }) {
-  return <div>Gallery Page</div>;
+  const artName = searchParams?.art || "FractalFlow";
+
+  return (
+    <main className="h-screen w-screen overflow-hidden">
+      <ShaderCanvas artName={artName} />
+    </main>
+  );
 }
